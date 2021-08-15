@@ -3,6 +3,7 @@
 namespace Prokl\BitrixTwigBundle\DependencyInjection;
 
 use Exception;
+use LogicException;
 use Maximaster\Tools\Twig\TemplateEngine;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +28,13 @@ class BitrixTwigExtension extends Extension
     {
         if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
             throw new \RuntimeException('Бандл BitrixTwigExtension работает только под Битриксом.');
+        }
+
+        if (!class_exists('Prokl\CustomFrameworkExtensionsBundle\DependencyInjection\CustomFrameworkExtensionsExtension')) {
+            throw new LogicException(
+                'Чтобы использовать Твиг нужно установить и активировать core.framework.extension.bundle. 
+              Попробуйте composer require proklung/core-framework-extension-bundle.'
+            );
         }
 
         $loader = new YamlFileLoader(
