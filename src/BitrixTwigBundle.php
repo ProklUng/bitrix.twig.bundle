@@ -4,6 +4,7 @@ namespace Prokl\BitrixTwigBundle;
 
 use Prokl\BitrixTwigBundle\DependencyInjection\BitrixTwigExtension;
 use Prokl\BitrixTwigBundle\DependencyInjection\CompilerPass\MakeExtensionsPublic;
+use Prokl\BitrixTwigBundle\DependencyInjection\CompilerPass\TwigExtensionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -34,6 +35,7 @@ class BitrixTwigBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new TwigExtensionConfigurator());
         $container->addCompilerPass(new MakeExtensionsPublic());
     }
 }
