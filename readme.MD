@@ -46,7 +46,7 @@ framework:
       '%kernel.project_dir%/../../vendor/symfony/web-profiler-bundle/Resources/views': WebProfiler
 
     cache: false
-    cache_dir: '/bitrix/cache/twig'
+    cache_dir: '%kernel.project_dir%/bitrix/cache/twig'
     autoescape: 'name'
     autoescape_service: ~
     autoescape_service_method: ~
