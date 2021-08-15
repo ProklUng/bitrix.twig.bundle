@@ -1,8 +1,9 @@
-# Бандл для Symfony+Битрикс, дающий возможность использовать Twig 
+# Базовый бандл для Symfony+Битрикс, дающий возможность использовать Twig 
 
-***INTERNAL***
+В результате в контейнере появляется сервис `twig.instance` (и `twig`) со сконфигурированным экземпляром Twig
+(без всяких наворотов и продвинутых конфигураций).
 
-В результате в контейнере появляется сервис `twig.instance` (и `twig`) со сконфигурированным экземпляром Twig. Плюс Twig автоматически подцепляется к системе после загрузки контейнера.
+Плюс Twig автоматически подцепляется к системе после загрузки контейнера.
 
 ## Установка
 
@@ -53,34 +54,3 @@ framework:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
 ```
-
-## Прочее
-
-Если на проекте используется [пакет](https://github.com/ProklUng/tools.twig) с поддержкой твиговского движка
-в компонентах, то в экземпляр того Твига автоматически перебрасываются все зарегистрированные в контейнере
-`extensions` (то, что отмечено в конфигах тэгом `twig.extension`) и `runtimes` (тэг `twig.runtime`).
-
-Также эта штука поддается использованию автономно, без контейнера.
-
-Где-нибудь в `init.php` (для `extensions`; для `runtimes` класс обработчик - `Prokl\BitrixOrdinaryToolsBundle\Services\Twig\TwigRuntimesBag`):
-
-```php
-use Prokl\BitrixTwigBundle\Services\Twig\TwigExtensionsBag;
-use Bitrix\Main\EventManager;
-
-$events = [new Local\TwigExtension, Local\FooExtension::class];
-$handler = new TwigExtensionsBag($events);
-
-$eventManager = EventManager::getInstance();
-$eventManager->addEventHandler(
-    '',
-    'onAfterTwigTemplateEngineInited',
-    [$handler, 'handle']
-);
-```
-
-Если [пакет](https://github.com/ProklUng/tools.twig) не установлен, то соответствующие сервисы
-удаляется на стадии компиляции контейнера.
-
-Изначальная конфигурация [пакета](https://github.com/ProklUng/tools.twig) имеет приоритет над прокидываемым
-снаружи.

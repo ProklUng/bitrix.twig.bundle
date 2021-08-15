@@ -19,9 +19,17 @@ class TwigExtensionConfigurator implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->hasDefinition('twig.cache.runtime')) {
+            return;
+        }
+
         // Кэшер для runtime директивы cacher.
         $cacherTwigDefinition = $container->getDefinition('twig.cache.runtime');
-        $serviceCacherId = $container->getParameter('twig.cacher');
+
+        $serviceCacherId = null;
+        if ($container->hasParameter('twig.cacher')) {
+            $serviceCacherId = $container->getParameter('twig.cacher');
+        }
 
         // null => значит фича отключена.
         if ($serviceCacherId === null) {
@@ -35,24 +43,5 @@ class TwigExtensionConfigurator implements CompilerPassInterface
 
         $newCacherDef = $container->getDefinition($serviceCacherId);
         $cacherTwigDefinition->replaceArgument(0, $newCacherDef);
-    }
-
-    /**
-     * Удалить (сервис, алиас), если существует.
-     *
-     * @param ContainerBuilder $container Контейнер.
-     * @param string           $serviceId ID сервиса.
-     *
-     * @return void
-     */
-    private function removeIfExists(ContainerBuilder $container, string $serviceId)
-    {
-        if ($container->hasDefinition($serviceId)) {
-            $container->removeDefinition($serviceId);
-        }
-
-        if ($container->hasAlias($serviceId)) {
-            $container->removeAlias($serviceId);
-        }
     }
 }
