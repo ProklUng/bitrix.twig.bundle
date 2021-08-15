@@ -43,12 +43,6 @@ class BitrixTwigExtension extends Extension
         );
 
         $loader->load('services.yaml');
-
-        // Не установлен maximaster/twig.tools - удаляю лишнее.
-        if (!class_exists(TemplateEngine::class)) {
-            $container->removeDefinition('maximaster_tools_extension_migrator');
-            $container->removeDefinition('maximaster_tools_runtimes_migrator');
-        }
     }
 
     /**

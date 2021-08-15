@@ -58,17 +58,3 @@ services:
       - '@twig.instance'
     class: Prokl\BitrixTwigBundle\Services\TemplateCacheWarmer
     tags: [kernel.cache_warmer]
-
-  # Мигратор extensions в Твиг от maximaster.twig.tool.
-  maximaster_tools_extension_migrator:
-    arguments:
-      - !tagged_iterator twig.extension
-    tags:
-      - { name: bitrix.events.init, module: '', event: onAfterTwigTemplateEngineInited, method: handle, sort: 100 }
-
-  # Мигратор runtimes в Твиг от maximaster.twig.tool.
-  maximaster_tools_runtimes_migrator:
-    arguments:
-      - !tagged_iterator twig.runtime
-    tags:
-      - { name: bitrix.events.init, module: '', event: onAfterTwigTemplateEngineInited, method: handle, sort: 100 }
