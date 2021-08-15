@@ -1,0 +1,74 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  _instanceof:
+    Twig\Extension\ExtensionInterface:
+      tags: ['twig.extension']
+
+    Twig\Loader\LoaderInterface:
+      tags: [ 'twig.loader' ]
+
+    Twig\Extension\RuntimeExtensionInterface:
+      tags: [ 'twig.runtime' ]
+
+  # Twig loader
+  twig.loader:
+    class: Twig\Loader\FilesystemLoader
+    arguments:
+      - '%twig_paths%'
+
+  # Twig
+  twig_service:
+    class: Prokl\BitrixTwigBundle\Services\TwigService
+    arguments:
+      - '@twig.loader'
+      - '%debug%'
+      - '%twig_cache_dir%'
+      - '%twig_config%'
+    calls:
+      - setContainer: ['@service_container']
+
+  # Экземпляр Twig.
+  twig.instance:
+    class: Twig\Environment
+    factory: ['@twig_service', 'instance']
+
+  twig: '@twig.instance'
+
+  # Runtime configurator
+  twig_runtime_configurator:
+    class: Prokl\BitrixTwigBundle\Services\TwigRuntimeConfigurator
+    arguments:
+      - '@twig.instance'
+      - !tagged_iterator twig.runtime
+
+  twig_runtime_configurator.init:
+    class: Prokl\BitrixTwigBundle\Services\TwigRuntimeConfigurator
+    factory: ['@twig_runtime_configurator', 'register']
+    tags:
+      - { name: service.bootstrap }
+
+  # Template cache warmer
+  Prokl\BitrixTwigBundle\Services\TemplateCacheWarmer:
+    autoconfigure: false
+    arguments:
+      - '@twig.instance'
+    class: Prokl\BitrixTwigBundle\Services\TemplateCacheWarmer
+    tags: [kernel.cache_warmer]
+
+  # Мигратор extensions в Твиг от maximaster.twig.tool.
+  maximaster_tools_extension_migrator:
+    arguments:
+      - !tagged_iterator twig.extension
+    tags:
+      - { name: bitrix.events.init, module: '', event: onAfterTwigTemplateEngineInited, method: handle, sort: 100 }
+
+  # Мигратор runtimes в Твиг от maximaster.twig.tool.
+  maximaster_tools_runtimes_migrator:
+    arguments:
+      - !tagged_iterator twig.runtime
+    tags:
+      - { name: bitrix.events.init, module: '', event: onAfterTwigTemplateEngineInited, method: handle, sort: 100 }
